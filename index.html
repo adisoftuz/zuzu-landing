@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>zuzuchat — Telegram Bot</title>
+  
+  <meta name="description" content="zuzuchat Telegram botiga ulaning. Tezkor, qulay va xavfsiz.">
+  <meta property="og:title" content="zuzuchat — Telegram Bot">
+  <meta property="og:description" content="Telegramda botni ishga tushirish uchun bosing.">
+  <meta property="og:type" content="website">
+
+  <!-- ========================================== -->
+  <!-- META (FACEBOOK) PIXEL CODE (AGAR BO'LSA) -->
+  <!-- Agar Pixel ID bo'lsa, 'YOUR_PIXEL_ID' o'rniga yozing -->
+  <script>
+    const META_PIXEL_ID = ""; // Masalan: "123456789012345"
+
+    if (META_PIXEL_ID) {
+      !function(f,b,e,v,n,t,s)
+      {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+      n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+      if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+      n.queue=[];t=b.createElement(e);t.async=!0;
+      t.src=v;s=b.getElementsByTagName(e)[0];
+      s.parentNode.insertBefore(t,s)}(window, document,'script',
+      'https://connect.facebook.net/en_US/fbevents.js');
+      fbq('init', META_PIXEL_ID);
+      fbq('track', 'PageView');
+    }
+  </script>
+  <!-- ========================================== -->
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: radial-gradient(circle at top, #1e293b 0%, #0f172a 100%);
+      color: #f8fafc;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 24px 16px;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Ambient glow elements */
+    .glow-1 {
+      position: absolute;
+      top: -100px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 320px;
+      height: 320px;
+      background: radial-gradient(circle, rgba(56, 189, 248, 0.25) 0%, rgba(56, 189, 248, 0) 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .glow-2 {
+      position: absolute;
+      bottom: -80px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 280px;
+      height: 280px;
+      background: radial-gradient(circle, rgba(99, 102, 241, 0.2) 0%, rgba(99, 102, 241, 0) 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 420px;
+      background: rgba(30, 41, 59, 0.7);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 28px;
+      padding: 36px 24px 28px;
+      text-align: center;
+      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5), 0 0 50px -20px rgba(56, 189, 248, 0.15);
+      animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.98);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .avatar-wrapper {
+      position: relative;
+      width: 96px;
+      height: 96px;
+      margin: 0 auto 20px;
+    }
+
+    .avatar {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+      font-weight: 800;
+      color: #fff;
+      box-shadow: 0 8px 24px rgba(14, 165, 233, 0.35);
+      border: 3px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .online-badge {
+      position: absolute;
+      bottom: 4px;
+      right: 4px;
+      width: 18px;
+      height: 18px;
+      background: #10b981;
+      border: 3px solid #1e293b;
+      border-radius: 50%;
+      box-shadow: 0 0 10px #10b981;
+    }
+
+    h1 {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 6px;
+      color: #ffffff;
+      letter-spacing: -0.3px;
+    }
+
+    .username {
+      display: inline-block;
+      font-size: 14px;
+      font-weight: 600;
+      color: #38bdf8;
+      background: rgba(56, 189, 248, 0.12);
+      padding: 4px 12px;
+      border-radius: 20px;
+      margin-bottom: 16px;
+    }
+
+    .description {
+      font-size: 15px;
+      line-height: 1.5;
+      color: #94a3b8;
+      margin-bottom: 28px;
+    }
+
+    /* Benefits pill list */
+    .features {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 28px;
+      text-align: left;
+    }
+
+    .feature-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      padding: 10px 14px;
+      border-radius: 14px;
+      font-size: 13.5px;
+      color: #cbd5e1;
+    }
+
+    .feature-icon {
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(56, 189, 248, 0.15);
+      border-radius: 50%;
+      color: #38bdf8;
+      flex-shrink: 0;
+    }
+
+    /* Main CTA button */
+    .cta-button {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      width: 100%;
+      padding: 16px 20px;
+      background: linear-gradient(135deg, #0284c7 0%, #2563eb 100%);
+      color: #ffffff;
+      text-decoration: none;
+      font-size: 17px;
+      font-weight: 700;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px -5px rgba(2, 132, 199, 0.5), 0 0 20px rgba(37, 99, 235, 0.2);
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      overflow: hidden;
+    }
+
+    .cta-button:active {
+      transform: scale(0.98);
+      box-shadow: 0 5px 15px -3px rgba(2, 132, 199, 0.5);
+    }
+
+    /* Shimmer effect */
+    .cta-button::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -60%;
+      width: 40%;
+      height: 200%;
+      background: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 0.3) 50%,
+        rgba(255, 255, 255, 0) 100%
+      );
+      transform: rotate(25deg);
+      animation: shimmer 3s infinite;
+    }
+
+    @keyframes shimmer {
+      0% { left: -60%; }
+      30%, 100% { left: 140%; }
+    }
+
+    .tg-icon {
+      width: 24px;
+      height: 24px;
+      fill: currentColor;
+    }
+
+    .hint {
+      margin-top: 14px;
+      font-size: 12.5px;
+      color: #64748b;
+      line-height: 1.4;
+    }
+
+    .footer {
+      margin-top: 24px;
+      font-size: 11px;
+      color: #475569;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="glow-1"></div>
+  <div class="glow-2"></div>
+
+  <div class="container">
+    <div class="avatar-wrapper">
+      <div class="avatar">Z</div>
+      <div class="online-badge"></div>
+    </div>
+
+    <h1>zuzuchat</h1>
+    <div class="username">@zuzuchatbot</div>
+
+    <p class="description">
+      Bot xizmatlaridan foydalanish va darhol ma'lumot olish uchun quyidagi tugmani bosing:
+    </p>
+
+    <div class="features">
+      <div class="feature-item">
+        <div class="feature-icon">⚡</div>
+        <span>Tezkor va 24/7 faol avtomatlashtirilgan xizmat</span>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">🔒</div>
+        <span>Xavfsiz va to'g'ridan-to'g'ri Telegram orqali</span>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">🎁</div>
+        <span>Bepul va qulay foydalanish</span>
+      </div>
+    </div>
+
+    <a id="tgBtn" href="tg://resolve?domain=zuzuchatbot" class="cta-button" onclick="handleTgClick(event)">
+      <svg class="tg-icon" viewBox="0 0 24 24">
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.75-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .39z"/>
+      </svg>
+      <span>Botni Ishga Tushirish</span>
+    </a>
+
+    <div class="hint">
+      Agar Telegram avtomatik ochilmasa, <a href="https://t.me/zuzuchatbot" style="color: #38bdf8; text-decoration: underline;" target="_blank">bu yerni bosing</a>.
+    </div>
+  </div>
+
+  <div class="footer">
+    © 2026 zuzuchat • Barcha huquqlar himoyalangan
+  </div>
+
+  <script>
+    const tgUsername = "zuzuchatbot";
+    const appUrl = "tg://resolve?domain=" + tgUsername;
+    const webUrl = "https://t.me/" + tgUsername;
+
+    function handleTgClick(e) {
+      if (typeof fbq === 'function') {
+        fbq('track', 'Lead');
+        fbq('track', 'Contact');
+      }
+
+      // Try deep link first, fallback to web link if app doesn't open
+      const start = Date.now();
+      window.location.href = appUrl;
+
+      setTimeout(function() {
+        if (Date.now() - start < 1500) {
+          window.location.href = webUrl;
+        }
+      }, 1000);
+
+      e.preventDefault();
+    }
+
+    // Optional: automatic redirect after 1.5 seconds if arriving from ad
+    // setTimeout(function() {
+    //   window.location.href = appUrl;
+    // }, 1500);
+  </script>
+</body>
+</html>
